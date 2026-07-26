@@ -11,4 +11,4 @@ bazel_dep(name = "rapidjson", version = "1.1.0.bcr.20250205")
 bazel_dep(name = "rules_license", version = "1.0.0")
 
 # compilation DB; build_cleaner
-bazel_dep(name = "bant", version = "0.2.4")
+bazel_dep(name = "bant", version = "0.3.3")

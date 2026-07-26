@@ -133,7 +133,6 @@ cc_library(
     deps = [
         ":arch-xc7-frame",
         "//fpga:database-parsers",
-        "//fpga:memory-mapped-file",
         "@abseil-cpp//absl/container:btree",
         "@abseil-cpp//absl/log:check",
         "@abseil-cpp//absl/status:statusor",
