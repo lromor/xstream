@@ -7,14 +7,13 @@
  *
  * SPDX-License-Identifier: ISC
  */
-#include <gtest/gtest.h>
-
 #include <cstdint>
 #include <vector>
 
 #include "absl/types/span.h"
 #include "fpga/xilinx/arch-types.h"
 #include "fpga/xilinx/bitstream-reader.h"
+#include "gtest/gtest.h"
 
 namespace fpga {
 namespace xilinx {

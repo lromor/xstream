@@ -259,6 +259,7 @@ cc_test(
         ":arch-types",
         ":bitstream-reader",
         "@abseil-cpp//absl/types:span",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
 )
