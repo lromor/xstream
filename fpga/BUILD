@@ -35,6 +35,8 @@ cc_library(
     name = "memory-mapped-file",
     srcs = [
         "memory-mapped-file.cc",
+    ],
+    hdrs = [
         "memory-mapped-file.h",
     ],
     deps = [
@@ -72,7 +74,6 @@ cc_test(
     ],
     deps = [
         ":database-parsers",
-        ":memory-mapped-file",
         "@abseil-cpp//absl/container:flat_hash_map",
         "@abseil-cpp//absl/status:statusor",
         "@abseil-cpp//absl/strings:str_format",
@@ -100,7 +101,6 @@ cc_library(
         "@abseil-cpp//absl/status:statusor",
         "@abseil-cpp//absl/strings",
         "@abseil-cpp//absl/strings:str_format",
-        "@rapidjson",
     ],
 )
 
@@ -129,7 +129,6 @@ cc_binary(
         ":database",
         ":database-parsers",
         ":fasm-parser",
-        ":memory-mapped-file",
         "//fpga/xilinx:arch-types",
         "//fpga/xilinx:bitstream",
         "@abseil-cpp//absl/cleanup:cleanup",
