@@ -84,7 +84,13 @@ jobs:
       - run: |
           nix flake check
   NixBuild:
+    # Pushing to the cachix binary cache needs CACHIX_AUTH_TOKEN, which GitHub
+    # does not expose to pull requests from forks. Only build and push the
+    # cache on push/merge to main, never on external PRs.
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    env:
+      CACHIX_AUTH_TOKEN: "${{ secrets.CACHIX_AUTH_TOKEN }}"
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -94,10 +100,20 @@ jobs:
         with:
           name: fpga-assembler
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - run: |
+      - name: Build
+        run: |
+          nix build --no-link --print-out-paths
+      # Defensive: only push when a token is actually present. The job above
+      # already restricts this to push-to-main (where the secret exists), but
+      # this keeps the push steps safe if the trigger is ever widened.
+      - name: Push flake inputs to cachix
+        if: ${{ env.CACHIX_AUTH_TOKEN != '' }}
+        run: |
           nix flake archive --json \
             | jq -r '.path,(.inputs|to_entries[].value.path)' \
             | cachix push fpga-assembler
-      - run: |
+      - name: Push build output to cachix
+        if: ${{ env.CACHIX_AUTH_TOKEN != '' }}
+        run: |
           nix build --no-link --print-out-paths \
             | cachix push fpga-assembler
