@@ -96,8 +96,8 @@
                 registry = pkgs.fetchFromGitHub {
                   owner = "bazelbuild";
                   repo = "bazel-central-registry";
-                  rev = "5a6d227d0a69e6ab1dd5ad1cd82b9f61da633050";
-                  hash = "sha256-5ugohzWV/zMGhBfq0mHD3OdYluPHzjTOy4J1Xwhpjv4=";
+                  rev = "6873d34b26b6b294a80c7e4bd2cda1926fdfcc4d";
+                  hash = "sha256-iMjT8jar5x2JYl9OJoGrjljxtK0elwMsOYa1xnNVe6M=";
                 };
 
                 repoCache = pkgs.stdenv.mkDerivation {
@@ -115,7 +115,7 @@
                   # Trigger a build to get the new hash for the targeted repository cache
                   outputHash =
                     {
-                      x86_64-linux = "sha256-a1O4XNb/1dqMFKIbwrchqYTcvpZXqsv2wa4drkeFAJk=";
+                      x86_64-linux = "sha256-+m6lY9af3oZ4X5ZpcB8moql87YxbDJX1x5dYBwQjE8M=";
                     }
                     .${system} or (throw "No hash for system: ${system}");
 
