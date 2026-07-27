@@ -1,0 +1,39 @@
+name: cachix
+on:
+  push:
+    branches:
+      - main
+  # Allow re-populating the cache manually, e.g. after fixing flake hashes.
+  workflow_dispatch:
+jobs:
+  CachixPush:
+    runs-on: ubuntu-latest
+    # Pushing to the cachix binary cache needs CACHIX_AUTH_TOKEN, which GitHub
+    # only exposes to trusted contexts like the triggers above, never to pull
+    # requests from forks. The job-level env makes the token visible to the
+    # step guards below, which keep the push steps safe if the triggers are
+    # ever widened.
+    env:
+      CACHIX_AUTH_TOKEN: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v17
+        with:
+          name: fpga-assembler
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      # cachix-action pushes newly built store paths (including intermediate
+      # derivations such as the bazel repository cache) as they are built, so
+      # no explicit push of the build outputs is needed.
+      - name: Build
+        run: |
+          nix build --no-link --print-out-paths
+      # Flake inputs are substituted rather than built, so the post-build
+      # hooks above do not cover them; push them explicitly.
+      # https://docs.cachix.org/pushing#pushing-flake-inputs
+      - name: Push flake inputs to cachix
+        if: ${{ env.CACHIX_AUTH_TOKEN != '' }}
+        run: |
+          nix flake archive --json \
+            | jq -r '.path,(.inputs|to_entries[].value.path)' \
+            | cachix push fpga-assembler
