@@ -189,7 +189,7 @@ class ConfigurationOptions0Value {
   }
 
  private:
-  uint32_t value_;
+  uint32_t value_ = 0;
 };
 }  // namespace xc7
 }  // namespace xilinx
