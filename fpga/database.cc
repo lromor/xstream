@@ -363,6 +363,19 @@ void PartDatabase::ConfigBits(const std::string &tile_name,
   // fprintf(stderr, "%s %s %u\n", tile_name.c_str(), feature.c_str(), address);
   // Given the tilename, get the tile type.
   const Tile &tile = tiles_->grid.at(tile_name);
+
+  // Pseudo PIPs are keyed by the tile's *own* type (ppips_<type>.db), even
+  // when the tile borrows its segbits from another type through an alias
+  // (e.g. LIOI3_SING -> LIOI3). Resolve them before applying the alias, since
+  // the aliased type's database knows nothing about them.
+  AddSegbitsToCache(tile.type);
+  if (segment_bits_cache_.contains(tile.type)) {
+    const std::string own_key = absl::StrJoin({tile.type, feature}, ".");
+    if (segment_bits_cache_.at(tile.type).pips.contains(own_key)) {
+      return;
+    }
+  }
+
   // Either the feature tile type of the tile type alias.
   std::string tile_type = tile.type;
   std::string aliased_feature = feature;
@@ -438,7 +451,12 @@ void PartDatabase::ConfigBits(const std::string &tile_name,
       // config/routing)
       continue;
     }
-    const auto &segbits = features_segbits.at(tile_feature);
+    const auto segbits_it = features_segbits.find(tile_feature);
+    CHECK(segbits_it != features_segbits.end())
+      << "unknown feature " << tile_name << "." << feature << " (looked up "
+      << tile_feature.tile_feature << " in the " << tile_type
+      << " segbits/ppips database)";
+    const auto &segbits = segbits_it->second;
     matched = true;
     for (const auto &segbit : segbits) {
       const uint32_t address = base_address + segbit.word_column;
